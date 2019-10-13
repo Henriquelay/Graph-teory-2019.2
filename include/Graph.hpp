@@ -11,16 +11,16 @@ using std::pair;
 class Graph {
 
 private:
-    int **Adj;
+    unsigned int **Adj;
 
     unsigned int nVertices;
     unsigned int nEdges;
 
     // Functions
-    int** VEtoAdjMatrix(unsigned int V, set<pair<char,char>> E);
+    unsigned int** VEtoAdjMatrix(unsigned int V, set<pair<char,char>> E);
 
     // Setter
-    void setAdj(int **adj);
+    void setAdj(unsigned int **adj);
     void setnVertices(unsigned int nVertices);
     void setnEdges(unsigned int nEdges);
 
@@ -29,8 +29,8 @@ public:
     void printMatrix();
 
     // Getter
-    int** getAdj();
-    int getAdj(unsigned int i, unsigned int j);
+    unsigned int** getAdj();
+    unsigned int getAdj(unsigned int i, unsigned int j);
     unsigned int getnVertices();
     unsigned int getnEdges();
 

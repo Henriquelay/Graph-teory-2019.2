@@ -9,18 +9,7 @@ using std::cerr;
 using std::endl;
 using std::string;
 
-int main(/* int argc, char* argv[] */) {
-    // if(argc != 2) {
-    //     cerr << _BOLDRED << "Check inputs!" << _RESET << endl;
-    //     return 1;
-    // }
-    // string fileInput = argv[1];
-    // std::ifstream infile;
-
-    // infile.open(fileInput, std::ios::in);
-    // if(!infile.is_open()) {
-    //     cerr << _BOLDRED << "Check file!" << _RESET << endl;
-    // }
+int main() {
 
     unsigned int nGraphs;
     unsigned int Vertices, nEdges;
@@ -28,7 +17,7 @@ int main(/* int argc, char* argv[] */) {
     set<pair<char,char>> Edges;
     pair<char,char> edge;
     cin >> nGraphs;
-    cout << "NGrafos: " << nGraphs << endl;
+    // cout << "NGrafos: " << nGraphs << endl;
     for(unsigned int g = 0; g < nGraphs; g++) {
         cin >> Vertices;
         cin >> nEdges;
@@ -44,6 +33,11 @@ int main(/* int argc, char* argv[] */) {
         }
         Graph G = Graph(Vertices, Edges);
         G.printMatrix();
+        Edges.clear();
+
+        cout << "Case #" << g + 1 << ":" << endl;
+        set<char> componentes;
+
     }
 
     return 0;
