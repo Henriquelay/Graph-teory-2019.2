@@ -18,6 +18,7 @@ private:
 
     // Functions
     int** VEtoAdjMatrix(unsigned int V, set<pair<char,char>> E);
+    void DFSUtil(unsigned int v, bool visited[]);
 
     // Setter
     void setAdj(int **adj);
@@ -27,6 +28,7 @@ private:
 public:
     // Functions
     void printMatrix();
+    void output();
 
     // Getter
     int** getAdj();
@@ -36,6 +38,7 @@ public:
 
     // Constructors
     // Graph(int **Adj);
+    Graph();
     Graph(unsigned int V, set<pair<char,char>> E);
     // Destructor
     ~Graph();

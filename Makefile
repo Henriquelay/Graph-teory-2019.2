@@ -14,7 +14,7 @@ all: $(BIN)/$(EXECUTABLE)
 
 run: clean all
 	# clear
-	./$(BIN)/$(EXECUTABLE)
+	$(BIN)/$(EXECUTABLE) <<< "3 3 1 a c 10 10 a b a c a g b c c g e d d f h i i j j h 6 4 a b b c c a e f"
 
 $(BIN)/$(EXECUTABLE): $(SRC)/*.cpp
 	$(CXX) $(CXX_FLAGS) -I$(INCLUDE) -L$(LIB) $^ -o $@ $(LIBRARIES)

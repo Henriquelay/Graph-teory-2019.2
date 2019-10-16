@@ -10,41 +10,35 @@ using std::endl;
 using std::string;
 
 int main(/* int argc, char* argv[] */) {
-    // if(argc != 2) {
-    //     cerr << _BOLDRED << "Check inputs!" << _RESET << endl;
-    //     return 1;
-    // }
-    // string fileInput = argv[1];
-    // std::ifstream infile;
-
-    // infile.open(fileInput, std::ios::in);
-    // if(!infile.is_open()) {
-    //     cerr << _BOLDRED << "Check file!" << _RESET << endl;
-    // }
-
     unsigned int nGraphs;
-    unsigned int Vertices, nEdges;
-    char edge1, edge2;
-    set<pair<char,char>> Edges;
-    pair<char,char> edge;
     cin >> nGraphs;
-    cout << "NGrafos: " << nGraphs << endl;
-    for(unsigned int g = 0; g < nGraphs; g++) {
-        cin >> Vertices;
-        cin >> nEdges;
+
+    unsigned int Vertices[nGraphs], nEdges[nGraphs];
+    char edge1[nGraphs], edge2[nGraphs];
+    set<pair<char,char>> Edges[nGraphs];
+    pair<char,char> edge[nGraphs];
+    Graph graph[nGraphs];
+    // cout << "NGrafos: " << nGraphs << endl;
+    unsigned int g;
+    for(g = 0; g < nGraphs; g++) {
+        cin >> Vertices[g];
+        cin >> nEdges[g];
         // cout << "nVertices grafo " << g+1 << ": " << Vertices << endl;
         // cout << "nEdges grafo " << g+1 << ": " << nEdges << endl;
-        for(unsigned int v = 0; v < nEdges; v++) {
-            cin >> edge1;
-            cin >> edge2;
+        for(unsigned int v = 0; v < nEdges[g]; v++) {
+            cin >> edge1[g];
+            cin >> edge2[g];
             // cout << "Edge1 do edge nº " << v+1 << ": " << edge1 << endl;
             // cout << "Edge2 do edge nº " << v+1 << ": " << edge2 << endl;
-            edge = std::make_pair(edge1, edge2);
-            Edges.insert(edge);
+            edge[g] = std::make_pair(edge1[g], edge2[g]);
+            Edges[g].insert(edge[g]);
         }
-        Graph G = Graph(Vertices, Edges);
-        G.printMatrix();
     }
-
+    for(g = 0; g < nGraphs; g++) {
+        graph[g] = Graph(Vertices[g], Edges[g]);
+        cout << "Case #" << g+1 << ":" << endl;
+        graph[g].output();
+        cout << endl;
+    }
     return 0;
 }
