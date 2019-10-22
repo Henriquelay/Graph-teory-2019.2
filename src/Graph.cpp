@@ -52,23 +52,22 @@ void Graph::output() {
             // print all reachable vertices from v 
             DFSUtil(v, visited); 
             number++;
-            std::cout << std::endl; 
+            std::cout << std::endl;
         } 
     }
-    
     std::cout << number << " connect components" << std::endl;
 }
 
 void Graph::DFSUtil(unsigned int v, bool visited[]) { 
     // Mark the current node as visited and print it 
     visited[v] = true; 
-    std::cout << char(v + 'a') << ",";
-    std::cout << "V éh " << v;
+    // std::cout << "V éh " << v << ", " <<  char(v + 'a') << "  ";
+    std::cout << v << ',';
     // Recur for all the vertices 
     // adjacent to this vertex 
     for(unsigned int i = 0; i < this->getnVertices(); i++)
-        if(this->Adj[i][v] != 0)
-            if(!visited[i]) 
+        if(this->Adj[int(i)][int(v)] != 0)
+            if(!visited[int(i)]) 
                 DFSUtil(i, visited);
 } 
 
