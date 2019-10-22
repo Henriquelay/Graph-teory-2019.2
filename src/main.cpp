@@ -131,7 +131,7 @@ unsigned int Graph::getnEdges() {return this->nEdges;}
 Graph::Graph() {}
 Graph::Graph(unsigned int V, set<pair<char,char>> E) {
     this->setnVertices(V);
-        // std::cout << "N vert: " << E.size() << std::endl;
+        // std::cout << "N vert: " << E.size() << std::endl;    
     this->setnEdges(E.size());
     this->Adj = this->VEtoAdjMatrix(V, E);
 }
