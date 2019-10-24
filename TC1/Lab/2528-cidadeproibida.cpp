@@ -82,7 +82,7 @@ public:
         cout << endl;
     }
 
-    void dijkstrazinho(Vertice* ini) {
+    /* void dijkstrazinho(Vertice* ini) {
         int distancia_ini = 0;
         int custo = 0;
         ini -> distancia = 0;        
@@ -125,6 +125,46 @@ public:
                 itAresta++;
             }
         }
+    } */
+
+
+    void dijkstrazinho(Vertice* ini) {
+        int src = ini->id;
+        int nVertices = this->vertices.size();
+        int dist[nVertices]; 
+        bool fechado[nVertices];
+
+        int caminho[nVertices];
+
+        caminho[0] = -1
+        for(int i = 0; i < nVertices; i++) {
+            dist[i] = numeric_limits<int>::max();
+            fechado[i] = false;
+        }
+
+        // Distância de um vértice para ele mesmo é 0
+        dist[src] = 0
+
+        for(int count = 0; count < nVertices - 1; count++) {
+            // Pega o vértice de distância mínima ainda não visitado.
+            int min = numeric_limits<int>::max(), min_indice
+            for(int i = 0; i < nVertices; i++)
+                if(fechado[i] == false && dist[i] <= min)
+                    min = dist[i], min_indice = i;
+
+            fechado[min_indice] = true;
+
+            // Att o valor dos adjacentes
+            for(int v = 0; v < nVertices; v++)
+                if(!fechado[v] && graph[u][v] && dist[min_indice] + graph[min_indice][v] < dist[v]) {
+                    caminho[v] = min_indice;
+                    dist[v] = dist[min_indice] + graph[min_indice][v];
+                }
+        }
+        for(int i = 0; i < nVertices; i++)
+            if(dist[i] <= min)
+                min_indice = i;
+        cout << i;
     }
 };
 
@@ -178,7 +218,8 @@ int main(int argc, char* argv[]){
 
         // vertices.clear();
         // arestas.clear();
-        cout << verticeend[r-1]->distancia;
+        cout << verticeend[r-1]->distancia << endl;
+        cout << numeric_limits<int>::max() << endl;
         // delete grafo;    
     }
     in.close();

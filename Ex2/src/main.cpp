@@ -1,4 +1,48 @@
-#include "Graph.hpp"
+#include <iostream>
+#include <fstream>
+
+#include <cstdlib>
+#include <set>
+#include <tuple>
+
+using std::set;
+using std::pair;
+
+class Graph {
+
+private:
+    int **Adj;
+
+    unsigned int nVertices;
+    unsigned int nEdges;
+
+    // Functions
+    int** VEtoAdjMatrix(unsigned int V, set<pair<char,char>> E);
+    void DFSUtil(unsigned int v, bool visited[]);
+
+    // Setter
+    void setAdj(int **adj);
+    void setnVertices(unsigned int nVertices);
+    void setnEdges(unsigned int nEdges);
+
+public:
+    // Functions
+    void printMatrix();
+    void output();
+
+    // Getter
+    int** getAdj();
+    int getAdj(unsigned int i, unsigned int j);
+    unsigned int getnVertices();
+    unsigned int getnEdges();
+
+    // Constructors
+    // Graph(int **Adj);
+    Graph();
+    Graph(unsigned int V, set<pair<char,char>> E);
+    // Destructor
+    ~Graph();
+};
 
 // Functions
 int** Graph::VEtoAdjMatrix(unsigned int V, set<pair<char,char>> E) {
@@ -62,7 +106,7 @@ void Graph::DFSUtil(unsigned int v, bool visited[]) {
     // Mark the current node as visited and print it 
     visited[v] = true; 
     // std::cout << "V éh " << v << ", " <<  char(v + 'a') << "  ";
-    std::cout << v << ',';
+    std::cout << char(v + 'a') << ',';
     // Recur for all the vertices 
     // adjacent to this vertex 
     for(unsigned int i = 0; i < this->getnVertices(); i++)
@@ -87,7 +131,7 @@ unsigned int Graph::getnEdges() {return this->nEdges;}
 Graph::Graph() {}
 Graph::Graph(unsigned int V, set<pair<char,char>> E) {
     this->setnVertices(V);
-        // std::cout << "N vert: " << E.size() << std::endl;
+        // std::cout << "N vert: " << E.size() << std::endl;    
     this->setnEdges(E.size());
     this->Adj = this->VEtoAdjMatrix(V, E);
 }
@@ -99,4 +143,24 @@ Graph::~Graph() {
                 free(this->Adj[i]);
         free(this->getAdj());
     }
+}
+
+using std::cin;
+using std::cout;
+using std::cerr;
+using std::endl;
+using std::string;
+
+int main() {
+    int N, M, C, K, U, V, P;
+    cin >> N >> M >> C >> K;
+    while(N != 0 && M != 0 && C != 0 && K != 0) {
+        for(int i = 0; i < M; i++) {
+            cin >> U >> V >> P;
+        }
+    
+        Graph graph;
+    }
+
+    return 0;
 }
