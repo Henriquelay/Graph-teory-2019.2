@@ -10,6 +10,8 @@ using namespace std;
 class Aresta;
 class Vertice;
 
+
+
 class Aresta{
 public:
     Vertice* v1, *v2;
@@ -28,9 +30,12 @@ public:
     int distancia;
     set<Aresta*> conexoes;
 
+    Vertice() {
+        this->distancia = __INT_MAX__;
+        }
     Vertice(int id) {
         this->id = id;
-        this-> distancia = numeric_limits<int>::max();
+        this->distancia = __INT_MAX__;
     }
     ~Vertice() {
         set<Aresta*>::iterator itaresta = this->conexoes.begin();
@@ -39,7 +44,34 @@ public:
             itaresta++;
         }
     }
+
+    void printMe();
 };
+
+Vertice* menor_dist(set<Vertice*> &Q) {
+    Vertice *menor;
+    for(Vertice *v : Q) {
+        // v->printMe();
+        if(v->distancia < menor->distancia) menor = v;
+    }
+    return menor;
+}
+
+set<Vertice*> vizinhos(Vertice *u) {
+    set<Vertice*> vizinhanca;
+    for(Aresta* a : u->conexoes) {
+        Vertice *v = a->v1 == u ? a->v2 : a->v1;
+        vizinhanca.insert(v);
+    }
+    return vizinhanca;
+}
+
+void Vertice::printMe() {
+    cout << "ID: " << this->id << " Dist: " << this->distancia << endl << " Conexões: ";
+    for(Vertice *v : vizinhos(this))
+        cout << this->id << ", ";
+    cout << endl;
+}
 
 class Grafo {
 public:
@@ -82,89 +114,28 @@ public:
         cout << endl;
     }
 
-    /* void dijkstrazinho(Vertice* ini) {
-        int distancia_ini = 0;
-        int custo = 0;
-        ini -> distancia = 0;        
-        set<Vertice*> fechado;
-        set<Vertice*> aberto = this -> vertices;
-        fechado.insert(ini);
-        aberto.erase(ini);
-
-        //set<Vertice*>::iterator itVert = this->vertices.begin();
-        Vertice* k = ini;
-        Vertice* anterior = ini;
-        while(!aberto.empty()){
-            set<Aresta*>::iterator itAdjacente = anterior->conexoes.begin();
-            
-            Vertice* adjacencia = ((*itAdjacente) -> v1 == anterior) ?  (*itAdjacente) -> v2 : (*itAdjacente) -> v1;
-            while(aberto.find(adjacencia) == aberto.end()){
-                if(anterior->conexoes.find(*itAdjacente) == anterior->conexoes.end()){
-                    return;
-            }
-                adjacencia = ((*itAdjacente) -> v1 == anterior) ?  (*itAdjacente) -> v2 : (*itAdjacente) -> v1;
-                itAdjacente++;
-            }
-            k = adjacencia;
-            
-            fechado.insert(k);
-            aberto.erase(k);
-            set<Aresta*>::iterator itAresta = k->conexoes.begin();
-            while(itAresta != k->conexoes.end()) {
-                Vertice* vizinho = (*itAresta) -> v1;
-                if(vizinho == ini)
-                    vizinho = (*itAresta) -> v2;
-
-                if(aberto.find(vizinho) != aberto.end()){
-                    custo = (k-> distancia +1 > vizinho -> distancia) ? k-> distancia +1 : vizinho -> distancia;
-                    if(custo < vizinho -> distancia){
-                        vizinho-> distancia = custo;
-                        anterior = k;                        
-                    }
-                }
-                itAresta++;
-            }
-        }
-    } */
-
-
     void dijkstrazinho(Vertice* ini) {
-        int src = ini->id;
-        int nVertices = this->vertices.size();
-        int dist[nVertices]; 
-        bool fechado[nVertices];
+        set<Vertice*> Q;
+        for(Vertice *v : this->vertices)
+            Q.insert(v);
+        ini->distancia = 0;
 
-        int caminho[nVertices];
+        Vertice *u;
 
-        caminho[0] = -1
-        for(int i = 0; i < nVertices; i++) {
-            dist[i] = numeric_limits<int>::max();
-            fechado[i] = false;
-        }
+        
+        // for(Vertice* vertPrint : Q)
+        //     vertPrint->printMe();
 
-        // Distância de um vértice para ele mesmo é 0
-        dist[src] = 0
-
-        for(int count = 0; count < nVertices - 1; count++) {
-            // Pega o vértice de distância mínima ainda não visitado.
-            int min = numeric_limits<int>::max(), min_indice
-            for(int i = 0; i < nVertices; i++)
-                if(fechado[i] == false && dist[i] <= min)
-                    min = dist[i], min_indice = i;
-
-            fechado[min_indice] = true;
-
-            // Att o valor dos adjacentes
-            for(int v = 0; v < nVertices; v++)
-                if(!fechado[v] && graph[u][v] && dist[min_indice] + graph[min_indice][v] < dist[v]) {
-                    caminho[v] = min_indice;
-                    dist[v] = dist[min_indice] + graph[min_indice][v];
+        while(!Q.empty()) {
+            u = menor_dist(Q);
+            Q.erase(u);
+            for(Vertice *v : vizinhos(u)) {
+                int p = u->distancia + 1;
+                if(p < v->distancia) {
+                    v->distancia = p;
                 }
+            }
         }
-        for(int i = 0; i < nVertices; i++)
-            if(dist[i] <= min)
-                min_indice = i;
-        cout << i;
     }
 };
 
@@ -183,7 +154,7 @@ int main(int argc, char* argv[]){
         exit(1);
     }
     while (in >> n){
-            cout << "N=" << n << endl;
+            // cout << "N=" << n << endl;
         Vertice* verticeend[n];
         for(int i = 0; i < n; i++){
             Vertice* v = new Vertice(i+1);
@@ -191,7 +162,7 @@ int main(int argc, char* argv[]){
             verticeend[i] = v;
         }
         in >> m;
-            cout << "M=" << m << endl;
+            // cout << "M=" << m << endl;
         set<Aresta*> arestasssss;
         for(int i = 0; i < m; i++){
             in >> a;
@@ -204,7 +175,7 @@ int main(int argc, char* argv[]){
         in >> c;
         in >> r;
         in >> e;
-            cout << "ESTADUNIDO = " << e << endl;
+            // cout << "ESTADUNIDO = " << e << endl;
         for(int i = 0; i < n; i++) {
             if(verticeend[i]->id == e){
                 vertices.erase(verticeend[i]);
@@ -212,15 +183,13 @@ int main(int argc, char* argv[]){
             }
         }
         Grafo* grafo = new Grafo(vertices, arestasssss);
-        grafo->print();
+        // grafo->print();
 
         grafo->dijkstrazinho(verticeend[c-1]);
 
-        // vertices.clear();
-        // arestas.clear();
+
         cout << verticeend[r-1]->distancia << endl;
-        cout << numeric_limits<int>::max() << endl;
-        // delete grafo;    
+        // delete grafo;
     }
     in.close();
 }
