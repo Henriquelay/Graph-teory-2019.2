@@ -32,10 +32,14 @@ public:
 
     Vertice() {
         this->distancia = __INT_MAX__;
+        set<Aresta*> porra;
+        this->conexoes = porra;
         }
     Vertice(int id) {
         this->id = id;
         this->distancia = __INT_MAX__;
+        set<Aresta*> porra;
+        this->conexoes = porra;
     }
     ~Vertice() {
         set<Aresta*>::iterator itaresta = this->conexoes.begin();
@@ -127,14 +131,18 @@ public:
         //     vertPrint->printMe();
 
         while(!Q.empty()) {
+            cout << "ANTES ";
+            u->printMe();
             u = menor_dist(Q);
-            Q.erase(u);
+            cout << "DEPOIS ";
+            u->printMe();
             for(Vertice *v : vizinhos(u)) {
                 int p = u->distancia + 1;
                 if(p < v->distancia) {
                     v->distancia = p;
                 }
             }
+            Q.erase(u);
         }
     }
 };
