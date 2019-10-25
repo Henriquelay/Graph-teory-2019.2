@@ -22,6 +22,8 @@ public:
         this->v2 = v2;
     }
     ~Aresta(){}
+
+    void printMe();
 };
 
 class Vertice {
@@ -31,32 +33,38 @@ public:
     set<Aresta*> conexoes;
 
     Vertice() {
+        this->id = -1;
         this->distancia = __INT_MAX__;
-        set<Aresta*> porra;
-        this->conexoes = porra;
         }
     Vertice(int id) {
         this->id = id;
         this->distancia = __INT_MAX__;
-        set<Aresta*> porra;
-        this->conexoes = porra;
     }
     ~Vertice() {
         set<Aresta*>::iterator itaresta = this->conexoes.begin();
-        while(itaresta != this->conexoes.end()) {
-            delete *itaresta;
-            itaresta++;
+        for(Aresta *itaresta : this->conexoes) {
+            delete itaresta;
         }
     }
 
     void printMe();
 };
 
+void Aresta::printMe() {
+    cout << "V1 " << this->v1->id << endl;
+    cout << "V2 " << this->v2->id << endl;
+}
+
+
 Vertice* menor_dist(set<Vertice*> &Q) {
-    Vertice *menor;
+    Vertice *menor = new Vertice();
+    menor->distancia = __INT_MAX__;
     for(Vertice *v : Q) {
-        // v->printMe();
-        if(v->distancia < menor->distancia) menor = v;
+            // v->printMe();
+        if(v->distancia < menor->distancia) {
+            if(menor->distancia == __INT_MAX__) delete menor;
+            menor = v;
+        }
     }
     return menor;
 }
@@ -71,7 +79,8 @@ set<Vertice*> vizinhos(Vertice *u) {
 }
 
 void Vertice::printMe() {
-    cout << "ID: " << this->id << " Dist: " << this->distancia << endl << " Conexões: ";
+    cout << "ID: " << this->id;
+    cout << " Dist: " << this->distancia << endl << " Conexões: ";
     for(Vertice *v : vizinhos(this))
         cout << this->id << ", ";
     cout << endl;
@@ -80,25 +89,12 @@ void Vertice::printMe() {
 class Grafo {
 public:
     set<Vertice*> vertices;
-    set<Aresta*> arestas;
     
-    Grafo(set<Vertice*> vertices, set<Aresta*> arestas) {
+    Grafo(set<Vertice*> vertices) {
         this->vertices = vertices;
-        this->arestas = arestas;
     }
     ~Grafo(){
-        set<Vertice*>::iterator itVertice = this->vertices.begin();
-        while(itVertice != this->vertices.end()) {
-            delete *itVertice;
-            itVertice++;
-        }
         this->vertices.clear();
-        set<Aresta*>::iterator itAresta = this->arestas.begin();
-        while(itAresta != this->arestas.end()) {
-            delete *itAresta;
-            itAresta++;
-        }
-        this->arestas.clear();
     }
 
     void print() {
@@ -109,12 +105,6 @@ public:
             itvert++;
         }
         cout << endl;
-        cout << "Arestas:\n";
-        set<Aresta*>::iterator itaresta = this->arestas.begin();
-        while(itaresta != this->arestas.end()) {
-            cout << (*itaresta)->v1->id << ", " << (*itaresta)->v2->id << endl;
-            itaresta++;
-        }
         cout << endl;
     }
 
@@ -126,16 +116,15 @@ public:
 
         Vertice *u;
 
-        
         // for(Vertice* vertPrint : Q)
         //     vertPrint->printMe();
 
         while(!Q.empty()) {
-            cout << "ANTES ";
-            u->printMe();
+            // cout << "ANTES" << endl;
+            // u->printMe();
             u = menor_dist(Q);
-            cout << "DEPOIS ";
-            u->printMe();
+            // cout << "DEPOIS" << endl;
+            // u->printMe();
             for(Vertice *v : vizinhos(u)) {
                 int p = u->distancia + 1;
                 if(p < v->distancia) {
@@ -156,7 +145,7 @@ int main(int argc, char* argv[]){
     set<Vertice*> vertices;
     set<Aresta*> arestas;
 
-    in.open(argv[argc-1], ios::in);
+    in.open(argv[1], ios::in);
     if(!in.is_open()){
         cout << "Arquivo zicado.\n";
         exit(1);
@@ -184,20 +173,28 @@ int main(int argc, char* argv[]){
         in >> r;
         in >> e;
             // cout << "ESTADUNIDO = " << e << endl;
+
         for(int i = 0; i < n; i++) {
             if(verticeend[i]->id == e){
                 vertices.erase(verticeend[i]);
                 verticeend[i] = NULL;
             }
         }
-        Grafo* grafo = new Grafo(vertices, arestasssss);
+
+        for(Aresta* itaresta : arestasssss) {
+            itaresta->printMe();
+            if(itaresta->v1 == verticeend[e-1] || itaresta->v2 == verticeend[e-1])
+                arestasssss.erase(itaresta);
+        }
+
+        Grafo* grafo = new Grafo(vertices);
         // grafo->print();
 
         grafo->dijkstrazinho(verticeend[c-1]);
 
 
         cout << verticeend[r-1]->distancia << endl;
-        // delete grafo;
+        delete grafo;
     }
     in.close();
 }
