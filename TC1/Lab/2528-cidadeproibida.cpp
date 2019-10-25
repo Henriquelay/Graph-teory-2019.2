@@ -130,7 +130,7 @@ public:
 };
 
 int main(int argc, char* argv[]){
-    ifstream in;
+    // ifstream cin;
     int n, m;           // n = vertices; m = arestas;
                         // c = Curytyba (start); r = Riacho de Fevereiro (sumidouro); E = Estadunido;
     int a, b;
@@ -138,12 +138,15 @@ int main(int argc, char* argv[]){
     set<Vertice*> vertices;
     set<Aresta*> arestas;
 
-    in.open(argv[1], ios::in);
-    if(!in.is_open()){
-        cout << "Arquivo zicado.\n";
-        exit(1);
-    }
-    while (in >> n){
+    // cin.open(argv[1], ios::cin);
+    // if(!cin.is_open()){
+    //     cout << "Arquivo zicado.\n";
+    //     exit(1);
+    // }
+    while (cin >> n){
+        if(n == cin.eof()) {
+            return 0;
+        }
             // cout << "N=" << n << endl;
         Vertice* verticeend[n];
         for(int i = 0; i < n; i++){
@@ -151,20 +154,20 @@ int main(int argc, char* argv[]){
             vertices.insert(v);
             verticeend[i] = v;
         }
-        in >> m;
+        cin >> m;
             // cout << "M=" << m << endl;
         set<Aresta*> arestasssss;
         for(int i = 0; i < m; i++){
-            in >> a;
-            in >> b;
+            cin >> a;
+            cin >> b;
             Aresta* ar = new Aresta(verticeend[a-1],verticeend[b-1]);
             arestasssss.insert(ar);
             verticeend[a-1]->conexoes.insert(ar);
             verticeend[b-1]->conexoes.insert(ar);
         }
-        in >> c;
-        in >> r;
-        in >> e;
+        cin >> c;
+        cin >> r;
+        cin >> e;
             // cout << "ESTADUNIDO = " << e << endl;
 
         for(int i = 0; i < n; i++) {
@@ -190,5 +193,5 @@ int main(int argc, char* argv[]){
         arestasssss.clear();
         delete grafo;
     }
-    in.close();
+    // cin.close();
 }
