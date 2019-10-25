@@ -41,10 +41,7 @@ public:
         this->distancia = __INT_MAX__;
     }
     ~Vertice() {
-        set<Aresta*>::iterator itaresta = this->conexoes.begin();
-        for(Aresta *itaresta : this->conexoes) {
-            delete itaresta;
-        }
+        this->conexoes.clear();
     }
 
     void printMe();
@@ -99,12 +96,8 @@ public:
 
     void print() {
         cout << "Vertices:\n";
-        set<Vertice*>::iterator itvert = this->vertices.begin();
-        while(itvert != this->vertices.end()) {
-            cout << (*itvert)->id << ' ';
-            itvert++;
-        }
-        cout << endl;
+        for(Vertice *itVert : this->vertices)
+            cout << itVert->id << ' ';
         cout << endl;
     }
 
@@ -182,18 +175,19 @@ int main(int argc, char* argv[]){
         }
 
         for(Aresta* itaresta : arestasssss) {
-            itaresta->printMe();
+            // itaresta->printMe();
             if(itaresta->v1 == verticeend[e-1] || itaresta->v2 == verticeend[e-1])
                 arestasssss.erase(itaresta);
         }
+        // delete verticeend[e-1];
 
         Grafo* grafo = new Grafo(vertices);
         // grafo->print();
 
         grafo->dijkstrazinho(verticeend[c-1]);
-
-
         cout << verticeend[r-1]->distancia << endl;
+
+        arestasssss.clear();
         delete grafo;
     }
     in.close();
