@@ -8,19 +8,11 @@
 
 using namespace std;
 
-class Aresta;
 class Vertice;
 
-class Aresta{
-public:
-    Vertice* v1, *v2;
-
-    Aresta(){}
-    Aresta(Vertice* v1, Vertice* v2);
-    ~Aresta();
-
-    void printMe();
-};
+typedef pair<Vertice*,Vertice*> Aresta;
+typedef unordered_map<int,Vertice*> VerticeMap;
+typedef unordered_map<int,Aresta> ArestaMap;
 
 class Vertice {
 public:
@@ -37,65 +29,48 @@ public:
         this->distancia = __INT_MAX__;
     }
     ~Vertice() {
+        for(Aresta* a : this->conexoes) {
+            if(a->first == this)
+                a->second->conexoes.erase(a);
+            else
+                a->first->conexoes.erase(a);
+        }
         this->conexoes.clear();
     }
 
-    void printMe();
+    void printMe() {
+        cout << "ID: " << this->id;
+        cout << " Dist: " << this->distancia << endl << " Conexões: ";
+        for(Aresta *v : this->conexoes){
+            if(v->second != this)
+                cout << v->second->id << ", ";
+            else
+                cout << v->first->id << ", ";
+        }
+        cout << endl;
+    }
 };
 
-Aresta::Aresta(Vertice* v1, Vertice* v2) {
-    this->v1 = v1;
-    this->v2 = v2;
-    this->v1->conexoes.insert(this);
-    this->v2->conexoes.insert(this);
-}
-
-Aresta::~Aresta() {
-    this->v1->conexoes.erase(this);
-    this->v2->conexoes.erase(this);
-}
-
-void Aresta::printMe() {
-    cout << "V1 " << this->v1->id << endl;
-    cout << "V2 " << this->v2->id << endl;
-}
-
-
-Vertice* menor_dist(unordered_map<int,Vertice*> &Q) {
+Vertice* menor_dist(VerticeMap &Q) {
     Vertice *menor = new Vertice();
     menor->distancia = __INT_MAX__;
-    for(auto& v : Q) {
+    for(pair<int,Vertice*> v : Q) {
+            // cout << "MenorDist" << endl;
             // v->printMe();
         if(v.second->distancia < menor->distancia) {
-            if(menor->distancia == __INT_MAX__) delete menor;
+            if(menor->distancia == __INT_MAX__)
+                delete menor;
             menor = v.second;
         }
     }
     return menor;
 }
 
-set<Vertice*> vizinhos(Vertice *u) {
-    set<Vertice*> vizinhanca;
-    for(Aresta* a : u->conexoes) {
-        Vertice *v = a->v1 == u ? a->v2 : a->v1;
-        vizinhanca.insert(v);
-    }
-    return vizinhanca;
-}
-
-void Vertice::printMe() {
-    cout << "ID: " << this->id;
-    cout << " Dist: " << this->distancia << endl << " Conexões: ";
-    for(Vertice *v : vizinhos(this))
-        cout << this->id << ", ";
-    cout << endl;
-}
-
 class Grafo {
 public:
-    unordered_map<int, Vertice*> vertices;
+    VerticeMap vertices;
     
-    Grafo(unordered_map<int,Vertice*> vertices) {
+    Grafo(VerticeMap &vertices) {
         this->vertices = vertices;
     }
     ~Grafo(){
@@ -104,66 +79,66 @@ public:
 
     void print() {
         cout << "Vertices:\n";
-        for(pair<int,Vertice*> itVert : this->vertices)
-            cout << itVert.first << ' ';
-        cout << endl;
+        for(pair<int,Vertice*> itParVert : this->vertices)
+            itParVert.second->printMe();
+            cout << endl;
     }
 
     void dijkstrazinho(Vertice* ini) {
-        unordered_map<int,Vertice*> Q;
-        Q = this->vertices; //copia os vert
+        VerticeMap Q = VerticeMap(this->vertices); //copia os vert
+            // cout << "Tam do putão: " << Q.size() << endl;
         ini->distancia = 0;
 
-        Vertice *u;
+        Vertice *proximo;
 
-        // for(Vertice* vertPrint : Q)
-        //     vertPrint->printMe();
+            // for(pair<int,Vertice*> v : Q)
+            //     v.second->printMe();
 
         while(!Q.empty()) {
-            // cout << "ANTES" << endl;
-            // u->printMe();
-            u = menor_dist(Q);
-            // cout << "DEPOIS" << endl;
-            // u->printMe();
-            for(Vertice *v : vizinhos(u)) {
-                int p = u->distancia + 1;
-                if(p < v->distancia) {
-                    v->distancia = p;
+                // cout << "Dijkstra vértice" << endl;
+                // cout << "ANTES" << endl;
+                // proximo->printMe();
+            proximo = menor_dist(Q);
+                // cout << "DEPOIS" << endl;
+                // proximo->printMe();
+            for(Aresta *a : proximo->conexoes) {
+                // cout << "Dijkstra Aresta" << endl;
+                Vertice *vizinho = a->first == proximo ? a->second : a->first;
+                int p = proximo->distancia + 1;
+                if(p < vizinho->distancia) {
+                    vizinho->distancia = p;
                 }
             }
-            Q.erase(u->id);
+            Q.erase(proximo->id);
         }
     }
 };
 
-int main(int argc, char* argv[]){
-    // ifstream cin;
-    int n, m;           // n = vertices; m = arestas;
-                        // c = Curytyba (start); r = Riacho de Fevereiro (sumidouro); E = Estadunido;
+int main(){
+    int n, m;       // n = vertices; m = arestas;
     int a, b;
-    int c, r, e;
-    unordered_map<int, Vertice*> mapvertices;
-    unordered_map<int, Aresta*> maparestas;
+    int c, r, e;    // c = Curytyba (start); r = Riacho de Fevereiro (sumidouro); E = Estadunido;
+    VerticeMap mapvertices;
+    ArestaMap maparestas;
 
     while (cin >> n){
         if(n == cin.eof()) return 0;
-            // cout << "N = " << n << endl;
         for(int i = 1; i <= n; i++)
             mapvertices[i] = new Vertice(i);
 
         cin >> m;
-            // cout << "M=" << m << endl;
         for(int i = 1; i <= m; i++){
             cin >> a;
             cin >> b;
-            maparestas[i] = new Aresta(mapvertices[a], mapvertices[b]);
+            maparestas[i] = make_pair(mapvertices[a], mapvertices[b]);
+            mapvertices[a]->conexoes.insert(&maparestas[i]);
+            mapvertices[b]->conexoes.insert(&maparestas[i]);
         }
         cin >> c;
         cin >> r;
         cin >> e;
-            // cout << "ESTADUNIDO = " << e << endl;
 
-        
+        delete mapvertices[e];
         mapvertices.erase(e);
 
         Grafo* grafo = new Grafo(mapvertices);
@@ -171,8 +146,12 @@ int main(int argc, char* argv[]){
 
         grafo->dijkstrazinho(mapvertices[c]);
         cout << mapvertices[r]->distancia << endl;
-
+        
         delete grafo;
+
+        for(pair<int,Vertice*> i : mapvertices)
+            delete i.second;
+        mapvertices.clear();
+        maparestas.clear();
     }
-    // cin.close();
 }
