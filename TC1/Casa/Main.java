@@ -3,59 +3,41 @@ import java.util.Scanner;
 
 class Vertice {
 	int identificador;
-	int distancia;
 	boolean verificado;
 	ArrayList<Aresta> conexoes;
-
+	
 	public Vertice(int identificador, ArrayList<Aresta> conexoes) {
 		super();
-		this.distancia = Integer.MAX_VALUE;// 2147483647;
 		this.identificador = identificador;
 		this.conexoes = conexoes;
 		this.verificado = false;
 	}
-
 	public Vertice(int identificador) {
-		this.distancia = Integer.MAX_VALUE;
 		this.identificador = identificador;
 		this.conexoes = new ArrayList<Aresta>();
 		this.verificado = false;
 	}
-
 	public int getIdentificador() {
 		return identificador;
 	}
-
-	public int getDistancia() {
-		return distancia;
-	}
-
 	public void setIdentificador(int identificador) {
 		this.identificador = identificador;
 	}
-
-	public void setDistancia(int dist) {
-		this.distancia = dist;
-	}
-
 	public ArrayList<Aresta> getConexoes() {
 		return conexoes;
 	}
-
 	public void setConexoes(ArrayList<Aresta> conexoes) {
 		this.conexoes = conexoes;
 	}
-
 	public boolean isVerificado() {
 		return verificado;
 	}
-
 	public void setVerificado(boolean verificado) {
 		this.verificado = verificado;
 	}
 }
 
-class Aresta {
+class Aresta{
 	int verticePartida, verticeDestino;
 
 	public Aresta(int verticePartida, int verticeDestino) {
@@ -79,111 +61,95 @@ class Aresta {
 	public void setVerticeDestino(int verticeDestino) {
 		this.verticeDestino = verticeDestino;
 	}
-
+	
+	
+	
 }
 
-class Grafo {
+class Grafo{
 	ArrayList<Vertice> vertices;
 	ArrayList<Aresta> arestas;
 	boolean fconexo;
-
 	public Grafo(ArrayList<Vertice> vertices, ArrayList<Aresta> arestas) {
 		super();
 		this.vertices = vertices;
 		this.arestas = arestas;
 		this.fconexo = false;
 	}
-
 	public Grafo() {
 		this.vertices = new ArrayList<Vertice>();
 		this.arestas = new ArrayList<Aresta>();
 		this.fconexo = false;
 	}
-
 	public ArrayList<Vertice> getVertices() {
 		return vertices;
 	}
-
 	public void setVertices(ArrayList<Vertice> vertices) {
 		this.vertices = vertices;
 	}
-
 	public ArrayList<Aresta> getArestas() {
 		return arestas;
 	}
-
 	public void setArestas(ArrayList<Aresta> arestas) {
 		this.arestas = arestas;
 	}
-
+	
 	public boolean isFconexo() {
 		return fconexo;
 	}
-
 	public void setFconexo(boolean fconexo) {
 		this.fconexo = fconexo;
 	}
-
-
+	boolean verificarConexidade() {
+		boolean fconexo = true;
+		for(Vertice v1 : this.getVertices()) {
+			for (Vertice v2 : this.getVertices() ) {
+				if (v1 != v2 && fconexo) {
+					fconexo = verificarCaminho(v1, v2);
+					if(fconexo) {
+						// System.out.println("Há caminho de " + v1.getIdentificador() + " a " + v2.getIdentificador());
+						// System.out.println("---");
+					}
+					setarVerificado();
+				}
+			}
+		}		
+		return fconexo;		
+	}
+	
 	void setarVerificado() {
 		for (Vertice v : this.getVertices()) {
 			v.setVerificado(false);
 		}
 	}
 
-
-
-	Vertice procuraVertice(int id, ArrayList<Vertice> vertices) {
-		for (Vertice v : vertices) {
-			if (v.getIdentificador() == id) {
-				return v;
-			}
+	void printarArestas(){
+		for(Aresta a : this.getArestas()){
+			System.out.println(a.getVerticePartida() + " -> " + a.getVerticeDestino());			
 		}
-		return null;
 	}
 
-	int didijkstra(Vertice ini) {
-		ArrayList<Vertice> Q = new ArrayList<Vertice>(this.getVertices());
-		// this.getVertices();
-		ini.setDistancia(0);
-		
-		Vertice prox;
+	boolean verificarCaminho(Vertice a, Vertice b) {
+		//System.out.println("No vértice " + a.getIdentificador());
+		a.setVerificado(true);
 
-		while (Q.size() > 1) {
-			prox = menorDist(Q);
-			for (Aresta a : prox.getConexoes()) {
-				Vertice vizinho = procuraVertice(a.verticePartida, Q) == prox ? procuraVertice(a.verticeDestino, Q)
-						: procuraVertice(a.verticePartida, Q);
-				if (Q.contains(vizinho)) {
-					int d = prox.getDistancia() + 1;
-					//System.out.println("Distancia: " + d);
-					if (d < vizinho.getDistancia()) {
-						vizinho.setDistancia(d);
-						for (Vertice v : this.getVertices()) {
-							if (vizinho.getIdentificador() == v.getIdentificador()) {
-								v.setDistancia(d);
-								break;
-							}
-						}
-					}
+		for (int i = 0; i < a.getConexoes().size(); i++) {
+				// System.out.println("Númeto de arestas de " + a.getIdentificador() + " = " + a.getConexoes().size());
+			if(this.getVertices().get(a.getConexoes().get(i).getVerticeDestino()-1) == b){
+				//this.setFconexo(true);
+				return true;
+			}
+			if(! this.getVertices().get(a.getConexoes().get(i).getVerticeDestino()-1).isVerificado()) {
+					// System.out.println("Não é o vértice " + b.getIdentificador() +" ainda");
+					// System.out.println("Vamos para o vértice " + this.getVertices().get(a.getConexoes().get(i).getVerticeDestino()-1).getIdentificador());
+				if(verificarCaminho(this.getVertices().get(a.getConexoes().get(i).getVerticeDestino()-1), b)){
+					return true;
 				}
-
-			}
-			// System.out.println("VERTICE " + (prox.getIdentificador()));
-			Q.remove(prox);
+			}			
 		}
-		return 0;
-	}
-
-	public static Vertice menorDist(ArrayList<Vertice> Q) {
-		if (Q == null)
-			return null;
-		Vertice menor = Q.get(0);
-		for (Vertice v : Q)
-			if (v.getDistancia() < menor.getDistancia())
-				menor = v;
-
-		return menor;
+		
+		//System.out.println("Vo retorna falso fodase");
+		return false;
 	}
 }
 
@@ -191,47 +157,41 @@ public class Main {
 
 	public static void main(String[] args) {
 		int n, m;
-		int a, b;
-		int c, r, e;
-
+		int v, w, p;
+		
 		Scanner entrada = new Scanner(System.in);
-
-		while (entrada.hasNextInt()) {
-			Grafo g = new Grafo();
-			n = entrada.nextInt();
-			m = entrada.nextInt();
+		n = entrada.nextInt();
+		m = entrada.nextInt();
+		
+		while (n != 0 && m != 0) {
+			Grafo grafo = new Grafo();
 			for (int i = 0; i < n; i++) {
-				Vertice v = new Vertice(i + 1);
-				g.getVertices().add(v);
+				Vertice ver = new Vertice(i+1);
+				grafo.getVertices().add(ver);
 			}
+			
 			for (int j = 0; j < m; j++) {
-				a = entrada.nextInt();
-				b = entrada.nextInt();
-				Aresta ar = new Aresta(a, b);
-				g.getArestas().add(ar);
-				g.getVertices().get(a - 1).getConexoes().add(ar);
-				g.getVertices().get(b - 1).getConexoes().add(ar);
-			}
-			c = entrada.nextInt();
-			r = entrada.nextInt();
-			e = entrada.nextInt();
-
-			for (Aresta ar : g.getVertices().get(e - 1).getConexoes()) {
-				g.getArestas().remove(ar);
-			}
-			g.getVertices().remove(e - 1);
-			for (Vertice v : g.getVertices()) {
-				if (v.getIdentificador() == c) {
-					g.didijkstra(v);
+				v = entrada.nextInt();
+				w = entrada.nextInt();
+				p = entrada.nextInt();
+				Aresta a = new Aresta(v, w);
+				grafo.getArestas().add(a);				
+				grafo.vertices.get(v-1).getConexoes().add(a);
+				if(p == 2) {
+					Aresta a2 = new Aresta(w, v);
+					grafo.getVertices().get(w-1).getConexoes().add(a2);
+					grafo.getArestas().add(a2);
 				}
 			}
-
-			for (Vertice v : g.getVertices()) {
-				if (v.getIdentificador() == r) {
-					System.out.println(v.getDistancia());
-				}
-			}
+			
+			
+			// grafo.printarArestas();
+			int resposta = (grafo.verificarConexidade()) ? 1 : 0;
+			System.out.println(resposta);
+			n = entrada.nextInt();
+			m = entrada.nextInt();			
 		}
 		entrada.close();
-	}
+	}	
+	
 }
