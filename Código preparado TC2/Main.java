@@ -39,31 +39,48 @@ public class Main {
             
             Graph grafo = new Graph(new LinkedList<Vertice>(vertices.values()));
             System.out.println(grafo);
+            grafo.dijkstra(vertices.firstEntry().getValue());System.out.println(grafo);
         }
 
 
 
         scanner.close();
     }
+
+    static public Vertice menorDist(HashSet<Vertice> H) {
+        Vertice menor = null;
+        for(Vertice v : H) {
+            if(menor == null) {
+                menor = v;
+            }
+            if(v.dist < menor.dist) {
+                menor = v;
+            }
+        }
+        return menor;
+    }
 }
 
 class Vertice {
     String id;
+    int dist;
     LinkedList<Edge> edges;
 
     Vertice(String id) {
         this.id = id;
+        this.dist = Integer.MAX_VALUE;
         this.edges = new LinkedList<Edge>();
     }
 
     Vertice(String id, LinkedList<Edge> edges) {
         this.id = id;
+        this.dist = Integer.MAX_VALUE;
         this.edges = edges;
     }
 
     @Override
     public String toString() {
-        return this.id;
+        return this.id + " (" + this.dist + ")";
     }
 }
 
@@ -132,5 +149,41 @@ class Graph {
             }
         }
         return str;
+    }
+
+    public boolean hasVertice(Vertice v) {
+        return this.vertices.contains(v);
+    }
+    
+    public void dijkstra(Vertice initial) {
+        HashSet<Vertice> Q = new HashSet<Vertice>(this.vertices);
+		// this.getVertices();
+
+        Vertice prox;
+        initial.dist = 0;
+
+		while (Q.size() > 1) {
+			prox = Main.menorDist(Q);
+			for (Edge a : prox.edges) {
+				Vertice vizinho = Q.contains(a.from) ? a.to
+						: a.from;
+				if (Q.contains(vizinho)) {
+					int d = prox.dist + 1;
+					//System.out.println("Distancia: " + d);
+					if (d < vizinho.dist) {
+						vizinho.dist = d;
+						for (Vertice v : this.vertices) {
+							if (vizinho.id == v.id) {
+								v.dist = d;
+								break;
+							}
+						}
+					}
+				}
+
+			}
+			// System.out.println("VERTICE " + (prox.getIdentificador()));
+			Q.remove(prox);
+		}
     }
 }

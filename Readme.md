@@ -1,4 +1,4 @@
-Exemplo de comando para compilar e rodar um com exemplo de entrada.  
+# Exemplo de comando para compilar e rodar um com exemplo de entrada  
 
 javac Main.java && java Main <<< "4 5  
 1 2 1  
