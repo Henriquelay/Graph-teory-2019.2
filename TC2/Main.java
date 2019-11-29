@@ -1,72 +1,61 @@
-import java.util.HashSet;
-import java.util.LinkedList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.Scanner;
 
-class Vertice implements Comparable {
+class Vertice {
 	int identificador;
 	// int distancia;
 	boolean verificado;
-	LinkedList<Aresta> conexoes;
+	LinkedHashSet<Aresta> conexoes;
 
 	public int getIdentificador() {return identificador;}
 	public void setIdentificador(int identificador) {this.identificador = identificador;}
-	public LinkedList<Aresta> getConexoes() {return conexoes;}
-	public void setConexoes(LinkedList<Aresta> conexoes) {this.conexoes = conexoes;}
+	public LinkedHashSet<Aresta> getConexoes() {return conexoes;}
+	public void setConexoes(LinkedHashSet<Aresta> conexoes) {this.conexoes = conexoes;}
 	public boolean isVerificado() {return verificado;}
 	public void setVerificado(boolean verificado) {this.verificado = verificado;}
 
-	public Vertice(int identificador, LinkedList<Aresta> conexoes) {
+	public Vertice(int identificador, LinkedHashSet<Aresta> conexoes) {
 		super();
 		// this.setDistancia(Integer.MAX_VALUE);// 2147483647;
 		this.setIdentificador(identificador);
-		this.setConexoes(conexoes);
+		this.setConexoes(new LinkedHashSet<Aresta>(conexoes));
 		this.setVerificado(false);
 	}
 
 	public Vertice(int identificador) {
 		// this.setDistancia(Integer.MAX_VALUE);
 		this.setIdentificador(identificador);
-		this.setConexoes(new LinkedList<Aresta>());
+		this.setConexoes(new LinkedHashSet<Aresta>());
 		this.setVerificado(false);
-	}
-
-	public Vertice vizinhoMaisProximo() {
-		Vertice proximo = null;
-		int menorCusto = Integer.MAX_VALUE;
-		for (Aresta a : this.getConexoes()) {
-			if (a.getCusto() < menorCusto) {
-				proximo = a.getVerticeDestino() == this ? a.getVerticePartida() : a.getVerticeDestino();
-			}
-		}
-		return proximo;
-	}
-
-	public int cheapestAresta() {
-		int menorCusto = Integer.MAX_VALUE;
-		for (Aresta a : this.getConexoes()) {
-			if (a.getCusto() < menorCusto) {
-				menorCusto = a.getCusto();
-			}
-		}
-		return menorCusto;
 	}
 
 	@Override
 	public String toString() {
 		String str = this.getIdentificador() + ": \n";
 		for (Aresta e : this.getConexoes()) {
-			str += e.toString() + "\n";
+			if(e.getVerticePartida() == this) { 
+				str += e.toString() + "\n";
+			}
 		}
 		return str;
 	}
 
-	@Override
-	public int compareTo(Vertice arg0) {
-		return this.cheapestAresta() < arg0.cheapestAresta();
+	public int menorDistancia(Vertice v) {
+		int menor = Integer.MAX_VALUE;
+		LinkedHashSet<Aresta> intersection = new LinkedHashSet<Aresta>(this.getConexoes());
+		intersection.retainAll(v.getConexoes());
+		for(Aresta a : intersection) {
+			if(a.getCusto() < menor) {
+				menor = a.getCusto();
+			}
+		}
+		return menor;
 	}
 }
 
-class Aresta implements Comparable {
+class Aresta {
 	Vertice verticePartida, verticeDestino;
 	int custo;
 
@@ -96,31 +85,26 @@ class Aresta implements Comparable {
 		return this.getVerticePartida().getIdentificador() + " --(" + this.getCusto() + ")-- "
 				+ this.getVerticeDestino().getIdentificador();
 	}
-
-	@Override
-	public int compareTo(Object o) {
-		return this.getCusto().compareTo(o.getCusto());
-	}
 }
 
 class Grafo {
-	LinkedList<Vertice> vertices;
-	LinkedList<Aresta> arestas;
+	LinkedHashSet<Vertice> vertices;
+	LinkedHashSet<Aresta> arestas;
 
-	public Grafo(LinkedList<Vertice> vertices, LinkedList<Aresta> arestas) {
-		this.setVertices(vertices);
+	public Grafo(Collection<Vertice> vertices, LinkedHashSet<Aresta> arestas) {
+		this.setVertices(new LinkedHashSet<Vertice>(vertices));
 		this.setArestas(arestas);
 	}
 
 	public Grafo() {
-		this.setVertices(new LinkedList<Vertice>());
-		this.setArestas(new LinkedList<Aresta>());
+		this.setVertices(new LinkedHashSet<Vertice>());
+		this.setArestas(new LinkedHashSet<Aresta>());
 	}
 
-	public LinkedList<Vertice> getVertices() {return vertices;}
-	public void setVertices(LinkedList<Vertice> vertices) {this.vertices = vertices;}
-	public LinkedList<Aresta> getArestas() {return arestas;}
-	public void setArestas(LinkedList<Aresta> arestas) {this.arestas = arestas;}
+	public LinkedHashSet<Vertice> getVertices() {return vertices;}
+	public void setVertices(LinkedHashSet<Vertice> vertices) {this.vertices = vertices;}
+	public LinkedHashSet<Aresta> getArestas() {return arestas;}
+	public void setArestas(LinkedHashSet<Aresta> arestas) {this.arestas = arestas;}
 
 	@Override
 	public String toString() {
@@ -131,44 +115,35 @@ class Grafo {
 		return str;
 	}
 
-	Aresta menorConexao() {
-		Aresta menor = null;
-		for(Aresta a : this.getArestas()) {
-			if(menor == null || a.getCusto() < menor.getCusto()) {
-				menor = a;
-			}
-		}
-		return menor;
-	}
+	void primMST() { 
+		int pesoT = 0;
+		LinkedHashSet<Vertice> vertex = new LinkedHashSet<Vertice>();
+		vertex.add(this.getVertices().iterator().next());
+		LinkedHashSet<Vertice> vLinha = new LinkedHashSet<Vertice>(this.getVertices());
+		vLinha.remove(this.getVertices().iterator().next());
 
-	Grafo primMST() { 
-		if(this.getVertices().isEmpty()) {
-			return null;
-		}
-		int cheapConToV[] = new int[this.getVertices().size()];
-		Aresta cheapestEdge[] = new Aresta[this.getVertices().size()];
-		for(int i = 0; i < this.getVertices().size(); i++) {
-			cheapConToV[i] = Integer.MAX_VALUE;
-			cheapestEdge[i] = null;
-		}
-		Grafo prim = new Grafo();
-		HashSet<Vertice> Q = new HashSet<Vertice>(this.getVertices());
-		while(!Q.isEmpty()) {
-			Vertice menorCusto = Collection.min(Q);
-			prim.getVertices().add(menorCusto);
-			Q.remove(menorCusto);
-			if(cheapestEdge[menorCusto.getIdentificador()] != null) {
-				prim.getArestas().add(cheapestEdge[menorCusto.getIdentificador()]);
-			}
-			for(Aresta a : menorCusto.getConexoes()) {
-				Vertice oOutro = a.oOutro(menorCusto);
-				if(Q.contains(oOutro) && a.getCusto() < cheapConToV[oOutro.getIdentificador()] && oOutro != null) {
-					cheapConToV[oOutro.getIdentificador()] = a.getCusto();
-					cheapestEdge[oOutro.getIdentificador()] = a;
+		while(!vLinha.isEmpty()) {
+			int custo_min = Integer.MAX_VALUE;
+			// Vertice va = null;
+			Vertice vb = null;
+			for(Vertice v1: vertex) {
+				for(Vertice v2: vLinha) {
+					int custo = v1.menorDistancia(v2);
+					if(custo < custo_min) {
+						// va = v1;
+						vb = v2;
+						custo_min = custo;
+					}
 				}
 			}
+			if(custo_min < Integer.MAX_VALUE) {
+				vertex.add(vb);
+				vLinha.remove(vb);
+				pesoT += custo_min;
+			}
 		}
-		return prim;
+
+		System.out.println(pesoT);
 	}
 }
 
@@ -178,31 +153,29 @@ public class Main {
 		int U, V, C;
 
 		Scanner entrada = new Scanner(System.in);
+		LinkedHashSet<Aresta> edges = new LinkedHashSet<Aresta>();
 
-		LinkedList<Aresta> edges = new LinkedList<Aresta>();
-		LinkedList<Vertice> vertices = new LinkedList<Vertice>();
+		HashMap<Integer,Vertice> vertices = new HashMap<Integer,Vertice>();
 
 		try {
 			N = entrada.nextInt();
 			M = entrada.nextInt();
 			for (int i = 0; i < N; i++) {
 				Vertice v = new Vertice(i);
-				vertices.add(v);
+				vertices.put(i,v);
 			}
 			for (int i = 0; i < M; i++) {
 				U = entrada.nextInt() - 1;	// Pq as entradas começam do 1
 				V = entrada.nextInt() - 1;
-				C = entrada.nextInt() - 1;
+				C = entrada.nextInt();
 				Aresta ar = new Aresta(vertices.get(U), vertices.get(V), C);
 				edges.add(ar);
 				vertices.get(U).getConexoes().add(ar);
 				vertices.get(V).getConexoes().add(ar);
 			}
 			
-			Grafo g = new Grafo(vertices, edges);
-			// System.out.println(g);
-			Grafo prim = g.primMST();
-			System.out.println("cu");
+			Grafo g = new Grafo(vertices.values(), edges);
+			g.primMST();
 		}
 		finally {
 			entrada.close();
